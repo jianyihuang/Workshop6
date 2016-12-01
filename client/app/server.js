@@ -31,13 +31,27 @@ function getFeedItemSync(feedItemId) {
  * Emulates a REST call to get the feed data for a particular user.
  */
 export function getFeedData(user, cb) {
-  var userData = readDocument('users', user);
-  var feedData = readDocument('feeds', userData.feed);
-  // While map takes a callback, it is synchronous, not asynchronous.
-  // It calls the callback immediately.
-  feedData.contents = feedData.contents.map(getFeedItemSync);
-  // Return FeedData with resolved references.
-  emulateServerReturn(feedData, cb);
+  // var userData = readDocument('users', user);
+  // var feedData = readDocument('feeds', userData.feed);
+  // // While map takes a callback, it is synchronous, not asynchronous.
+  // // It calls the callback immediately.
+  // feedData.contents = feedData.contents.map(getFeedItemSync);
+  // // Return FeedData with resolved references.
+  // emulateServerReturn(feedData, cb);
+  var xhr = new XMLHttpRequest();
+//Then, call open() on the object with the HTTP verb and target URL.
+xhr.open('GET', '/user/4/feed');
+//Next, use setRequestHeader to set ‘Authorized’ to the base64 token you generated:
+xhr.setRequestHeader('Authorization', 'Bearer eyJpZCI6NH0=');
+// Next, attach an event listener, which will fire when the server sends a response to our request.
+// At that time, the response body will be available on the responseText property of the
+//XMLHttpRequest object:
+xhr.addEventListener('load', function() {
+// Call the callback with the data.
+cb(JSON.parse(xhr.responseText));
+});
+//Finally, use send() to send the request over the network!
+xhr.send();
 }
 
 /**
